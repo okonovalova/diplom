@@ -15,7 +15,6 @@ import com.example.diplom.ui.model.ImageData
 import com.example.diplom.ui.utils.BottomMenuListener
 import com.example.diplom.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -62,27 +61,20 @@ class EditPostViewModel @Inject constructor(
             val imageUri = downloadedImage.value?.uri
             val coords = coords.value
             if (imageUri != null) {
-                mediaRepository.downloadImage(imageUri)
-                    .flatMapConcat { url ->
-                        postRepository.editPost(id, content, link, url.data, coords)
-                    }
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val url = mediaRepository.downloadImage(imageUri)
+                val result = postRepository.editPost(id, content, link, url.data, coords)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             } else {
-                postRepository.editPost(id, content, link, downloadedImage.value?.url, coords)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = postRepository.editPost(id, content, link, downloadedImage.value?.url, coords)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }

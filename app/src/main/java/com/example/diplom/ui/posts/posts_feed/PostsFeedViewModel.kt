@@ -38,52 +38,45 @@ class PostsFeedViewModel @Inject constructor(
 
     fun getPosts() {
         viewModelScope.launch {
-            postRepository.getPosts()
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        result.data?.let { _postsData.postValue(it) }
-                    } else {
-                        Log.e("getPosts", result.error?.statusMessage.orEmpty())
-                    }
-                }
-
+            val result = postRepository.getPosts()
+            if (result.status == DataResult.Status.SUCCESS) {
+                result.data?.let { _postsData.postValue(it) }
+            } else {
+                Log.e("getPosts", result.error?.statusMessage.orEmpty())
+            }
         }
+
     }
 
     fun onLikeClicked(post: Post) {
         viewModelScope.launch {
             if (post.likedByMe) {
-                postRepository.dislikePost(post.id.toString())
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updatePost(it) }
-                        } else {
-                            Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = postRepository.dislikePost(post.id.toString())
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updatePost(it) }
+                } else {
+                    Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
+                }
+
             } else {
-                postRepository.likePost(post.id.toString())
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updatePost(it) }
-                        } else {
-                            Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = postRepository.likePost(post.id.toString())
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updatePost(it) }
+                } else {
+                    Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }
 
     fun onRemoveClicked(post: Post) {
         viewModelScope.launch {
-            postRepository.removePost(post.id.toString())
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        getPosts()
-                    } else {
-                        Log.e("onDeleteListener", result.error?.statusMessage.orEmpty())
-                    }
-                }
+            val result = postRepository.removePost(post.id.toString())
+            if (result.status == DataResult.Status.SUCCESS) {
+                getPosts()
+            } else {
+                Log.e("onDeleteListener", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 

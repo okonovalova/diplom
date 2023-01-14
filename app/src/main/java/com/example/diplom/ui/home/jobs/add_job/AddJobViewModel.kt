@@ -53,14 +53,12 @@ class AddJobViewModel @Inject constructor(
         viewModelScope.launch {
             val dateStartTime = jobDateStartTime.value
             val dateFinishTime = jobDateFinishTime.value
-            jobRepository.createJob(nameJob, position, dateStartTime.orEmpty(), dateFinishTime, link)
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        navigateToMainFragment.postValue(Unit)
-                    } else {
-                        Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                    }
-                }
+            val result = jobRepository.createJob(nameJob, position, dateStartTime.orEmpty(), dateFinishTime, link)
+            if (result.status == DataResult.Status.SUCCESS) {
+                navigateToMainFragment.postValue(Unit)
+            } else {
+                Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 

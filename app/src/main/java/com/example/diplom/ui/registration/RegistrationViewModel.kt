@@ -34,23 +34,26 @@ class RegistrationViewModel @Inject constructor(
     val nameError: LiveData<Boolean>
         get() = _nameError
     val navigateToMainFragment = SingleLiveEvent<Unit>()
+    val registrationError = SingleLiveEvent<String>()
 
     private val _downloadedImage: MutableLiveData<Uri?> = MutableLiveData(null)
     val downloadedImage: LiveData<Uri?>
         get() = _downloadedImage
 
     fun onRegistrateButtonClicked() {
-        if (login.isBlank() || password.isBlank() || name.isBlank()) return
+        if (login.isBlank() || password.isBlank() || name.isBlank()) {
+            registrationError.postValue("Заполните все поля")
+            return
+        }
 
         viewModelScope.launch {
-            userRepository.registrate(login, password, name, downloadedImage.value)
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        navigateToMainFragment.postValue(Unit)
-                    } else {
-                        Log.e("registrate", result.error?.statusMessage.orEmpty())
-                    }
-                }
+            val result = userRepository.registrate(login, password, name, downloadedImage.value)
+            if (result.status == DataResult.Status.SUCCESS) {
+                navigateToMainFragment.postValue(Unit)
+            } else {
+                registrationError.postValue(result.error?.statusMessage.toString())
+                Log.e("registration", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 
@@ -72,6 +75,4 @@ class RegistrationViewModel @Inject constructor(
         this.name = name
         _nameError.postValue(name.isBlank())
     }
-
-
 }

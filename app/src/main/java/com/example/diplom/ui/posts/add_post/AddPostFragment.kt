@@ -6,19 +6,18 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.example.diplom.R
 import com.example.diplom.databinding.FragmentAddPostBinding
-import com.example.diplom.ui.utils.visible
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -34,9 +33,9 @@ import kotlin.with
 
 
 @AndroidEntryPoint
-class AddPostFragment() : Fragment(), OnMapReadyCallback {
+class AddPostFragment : Fragment(R.layout.fragment_add_post), OnMapReadyCallback {
     private val viewModel: AddPostViewModel by viewModels()
-    private lateinit var binding: FragmentAddPostBinding
+    private val binding by viewBinding(FragmentAddPostBinding::bind)
     private lateinit var mMap: GoogleMap
 
 
@@ -61,15 +60,6 @@ class AddPostFragment() : Fragment(), OnMapReadyCallback {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentAddPostBinding.inflate(inflater)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.onInitView()
@@ -88,15 +78,15 @@ class AddPostFragment() : Fragment(), OnMapReadyCallback {
         viewModel.contentError.observe(viewLifecycleOwner) {
             with(binding.contentTextInput) {
                 isErrorEnabled = it
-                error = if (it) "Введите текст поста" else null
+                error = if (it) context.getString(R.string.error_post_content) else null
             }
         }
         viewModel.navigateToMainFragment.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
         viewModel.downloadedImage.observe(viewLifecycleOwner) {
-            binding.showMediaImageview.visible(it != null)
-            binding.addMediaButton.visible(it == null)
+            binding.showMediaImageview.isVisible = it != null
+            binding.addMediaButton.isVisible = it == null
             Glide
                 .with(binding.root)
                 .load(it)
@@ -104,7 +94,7 @@ class AddPostFragment() : Fragment(), OnMapReadyCallback {
         }
         viewModel.sendCoords.observe(viewLifecycleOwner) {
             binding.coordsCheckbox.isChecked = it
-            binding.mapview.visible(it)
+            binding.mapview.isVisible = it
         }
     }
 
@@ -115,13 +105,13 @@ class AddPostFragment() : Fragment(), OnMapReadyCallback {
             }
             true
         }
-        binding.contentTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.contentTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangeContent(text.toString())
         }
         binding.addMediaButton.setOnClickListener {
             selectImageFromGalleryResult.launch("image/*")
         }
-        binding.coordsCheckbox.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.coordsCheckbox.setOnCheckedChangeListener { _, _ ->
             viewModel.onSendCoordsChecked()
         }
         binding.cancelMediaImageview.setOnClickListener {

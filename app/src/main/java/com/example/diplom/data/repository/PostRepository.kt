@@ -11,20 +11,18 @@ import com.example.diplom.data.request.PostCreateRequest
 import com.example.diplom.domain.entity.Coords
 import com.example.diplom.domain.entity.Post
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     private val postService: PostService,
     private val preferenceService: PreferenceService,
-) : BaseRemoteRepository() {
+) : BaseRemoteRepository {
 
-    private val cache : MutableList<Post> = mutableListOf()
+    private val cache: MutableList<Post> = mutableListOf()
 
-    suspend fun getPosts(): Flow<DataResult<List<Post>>> {
-        return flow {
+    suspend fun getPosts(): DataResult<List<Post>> {
+        return withContext(Dispatchers.Default) {
             val result = getResult(
                 request = { postService.getPosts() },
                 mapTo = PostMapper::mapListDataToDomain
@@ -33,11 +31,11 @@ class PostRepository @Inject constructor(
                 cache.clear()
                 cache.addAll(it)
             }
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+            result
+        }
     }
 
-    suspend fun createPost(content: String, link: String?, imageUrl: String?, coords: Coords?): Flow<DataResult<Post>> {
+    suspend fun createPost(content: String, link: String?, imageUrl: String?, coords: Coords?): DataResult<Post> {
         val attachment = if (imageUrl == null) null else AttachmentData("IMAGE", imageUrl)
         val coordsData = if (coords == null) null else CoordsData(coords.lat, coords.long)
         val body = PostCreateRequest(
@@ -47,26 +45,24 @@ class PostRepository @Inject constructor(
             attachment = attachment,
             coords = coordsData
         )
-        return flow {
-            val result = getResult(
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { postService.createPost(body) },
                 mapTo = PostMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun likePost(id: String): Flow<DataResult<Post>> {
-        return flow {
-            val result = getResult(
+    suspend fun likePost(id: String): DataResult<Post> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { postService.likePost(id) },
                 mapTo = PostMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun  editPost(id: String, content: String, link: String?, imageUrl: String?, coords: Coords?): Flow<DataResult<Post>> {
+    suspend fun editPost(id: String, content: String, link: String?, imageUrl: String?, coords: Coords?): DataResult<Post> {
         val attachment = if (imageUrl == null) null else AttachmentData("IMAGE", imageUrl)
         val coordsData = if (coords == null) null else CoordsData(coords.lat, coords.long)
         val body = PostCreateRequest(
@@ -76,37 +72,34 @@ class PostRepository @Inject constructor(
             attachment = attachment,
             coords = coordsData
         )
-        return flow {
-            val result = getResult(
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { postService.createPost(body) },
                 mapTo = PostMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun dislikePost(id: String): Flow<DataResult<Post>> {
-        return flow {
-            val result = getResult(
+    suspend fun dislikePost(id: String): DataResult<Post> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { postService.dislikePost(id) },
                 mapTo = PostMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun removePost(id: String): Flow<DataResult<Unit>> {
-        return flow {
-            val result = getResult(
+    suspend fun removePost(id: String): DataResult<Unit> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { postService.removePost(id) },
                 mapTo = {}
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun getMyPosts (): Flow<DataResult<List<Post>>> {
-        return flow {
+    suspend fun getMyPosts(): DataResult<List<Post>> {
+        return withContext(Dispatchers.Default) {
             val result = getResult(
                 request = { postService.getMyPosts(preferenceService.userId.toString()) },
                 mapTo = PostMapper::mapListDataToDomain
@@ -115,7 +108,7 @@ class PostRepository @Inject constructor(
                 cache.clear()
                 cache.addAll(it)
             }
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+            result
+        }
     }
 }

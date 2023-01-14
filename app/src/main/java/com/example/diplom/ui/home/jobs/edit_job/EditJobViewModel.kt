@@ -59,15 +59,12 @@ class EditJobViewModel @Inject constructor(
             val id = job.id
             val dateStartTime = jobDateStartTime.value
             val dateFinishTime = jobDateFinishTime.value
-            jobRepository.editJob(id, nameJob, position, dateStartTime.orEmpty(), dateFinishTime, link)
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        navigateToMainFragment.postValue(Unit)
-                    } else {
-                        Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                    }
-                }
-
+            val result = jobRepository.editJob(id, nameJob, position, dateStartTime.orEmpty(), dateFinishTime, link)
+            if (result.status == DataResult.Status.SUCCESS) {
+                navigateToMainFragment.postValue(Unit)
+            } else {
+                Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 

@@ -7,19 +7,17 @@ import com.example.diplom.data.network.DataResult
 import com.example.diplom.data.request.JobCreateRequest
 import com.example.diplom.domain.entity.Job
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class JobRepository @Inject constructor(
     private val jobService: JobService
-) : BaseRemoteRepository() {
+) : BaseRemoteRepository {
 
-    private val cache : MutableList<Job> = mutableListOf()
+    private val cache: MutableList<Job> = mutableListOf()
 
-    suspend fun getJobs(): Flow<DataResult<List<Job>>> {
-        return flow {
+    suspend fun getJobs(): DataResult<List<Job>> {
+        return withContext(Dispatchers.Default) {
             val result = getResult(
                 request = { jobService.getJobs() },
                 mapTo = JobMapper::mapListDataToDomain
@@ -28,17 +26,17 @@ class JobRepository @Inject constructor(
                 cache.clear()
                 cache.addAll(it)
             }
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+            result
+        }
     }
 
     suspend fun createJob(
         name: String,
-        position:String,
+        position: String,
         start: String,
-        finish:String?,
+        finish: String?,
         link: String?,
-    ): Flow<DataResult<Job>> {
+    ): DataResult<Job> {
         val body = JobCreateRequest(
             id = 0,
             name = name,
@@ -47,23 +45,22 @@ class JobRepository @Inject constructor(
             finish = finish,
             link = link,
         )
-        return flow {
-            val result = getResult(
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { jobService.createJob(body) },
                 mapTo = JobMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
     suspend fun editJob(
-        id:Int,
+        id: Int,
         name: String,
-        position:String,
+        position: String,
         start: String,
-        finish:String?,
+        finish: String?,
         link: String?,
-    ): Flow<DataResult<Job>> {
+    ): DataResult<Job> {
         val body = JobCreateRequest(
             id = id,
             name = name,
@@ -72,22 +69,20 @@ class JobRepository @Inject constructor(
             finish = finish,
             link = link,
         )
-        return flow {
-            val result = getResult(
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { jobService.createJob(body) },
                 mapTo = JobMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun removeJob(id: String): Flow<DataResult<Unit>> {
-        return flow {
-            val result = getResult(
+    suspend fun removeJob(id: String): DataResult<Unit> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { jobService.removeJob(id) },
                 mapTo = {}
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 }

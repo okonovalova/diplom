@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.diplom.R
 import com.example.diplom.databinding.ItemJobBinding
 import com.example.diplom.domain.entity.Job
-import com.example.diplom.ui.utils.visible
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -56,7 +56,7 @@ class JobAdapter(
                 binding.jobPeriodTextview.text = "${convertDateFromStringTime(job.start)} - по настоящее время"
             }
 
-            binding.jobLinkImageview.visible(!job.link.isNullOrEmpty())
+            binding.jobLinkImageview.isVisible = !job.link.isNullOrEmpty()
 
             initListeners(job)
         }

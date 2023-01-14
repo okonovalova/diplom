@@ -13,7 +13,6 @@ import com.example.diplom.domain.entity.Coords
 import com.example.diplom.ui.utils.BottomMenuListener
 import com.example.diplom.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -64,26 +63,20 @@ class AddEventViewModel @Inject constructor(
             val eventType = eventType.value
             val dateTime = eventDateTime.value
             if (imageUri != null) {
-                mediaRepository.downloadImage(imageUri)
-                    .flatMapConcat { url ->
-                        eventRepository.createEvent(content, link, url.data, coords, eventType.orEmpty(), dateTime.orEmpty())
-                    }
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val url = mediaRepository.downloadImage(imageUri)
+                val result = eventRepository.createEvent(content, link, url.data, coords, eventType.orEmpty(), dateTime.orEmpty())
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             } else {
-                eventRepository.createEvent(content, link, null, coords, eventType.orEmpty(), dateTime.orEmpty())
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = eventRepository.createEvent(content, link, null, coords, eventType.orEmpty(), dateTime.orEmpty())
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }

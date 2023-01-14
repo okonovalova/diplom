@@ -6,20 +6,19 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.example.diplom.R
 import com.example.diplom.databinding.FragmentEditPostBinding
-import com.example.diplom.ui.utils.visible
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -28,11 +27,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EditPostFragment : Fragment(), OnMapReadyCallback {
+class EditPostFragment : Fragment(R.layout.fragment_edit_post), OnMapReadyCallback {
     private val viewModel: EditPostViewModel by viewModels()
-    private lateinit var binding: FragmentEditPostBinding
+    private val binding by viewBinding(FragmentEditPostBinding::bind)
     private lateinit var mMap: GoogleMap
-    val args: EditPostFragmentArgs by navArgs()
+    private val args: EditPostFragmentArgs by navArgs()
 
     private val selectImageFromGalleryResult =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -53,15 +52,6 @@ class EditPostFragment : Fragment(), OnMapReadyCallback {
             else -> {
             }
         }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentEditPostBinding.inflate(inflater)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -91,7 +81,7 @@ class EditPostFragment : Fragment(), OnMapReadyCallback {
         viewModel.contentError.observe(viewLifecycleOwner) {
             with(binding.contentTextInput) {
                 isErrorEnabled = it
-                error = if (it) "Введите текст поста" else null
+                error = if (it) context.getString(R.string.error_post_content) else null
             }
         }
         viewModel.navigateToMainFragment.observe(viewLifecycleOwner) {
@@ -99,8 +89,8 @@ class EditPostFragment : Fragment(), OnMapReadyCallback {
         }
         viewModel.downloadedImage.observe(viewLifecycleOwner) {
             val hasContent = it.uri != null || it.url != null
-            binding.showMediaImageview.visible(hasContent)
-            binding.addMediaButton.visible(!hasContent)
+            binding.showMediaImageview.isVisible = hasContent
+            binding.addMediaButton.isVisible = !hasContent
             if (!hasContent) return@observe
             Glide
                 .with(binding.root)
@@ -109,7 +99,7 @@ class EditPostFragment : Fragment(), OnMapReadyCallback {
         }
         viewModel.sendCoords.observe(viewLifecycleOwner) {
             binding.coordsCheckbox.isChecked = it
-            binding.mapview.visible(it)
+            binding.mapview.isVisible = it
         }
 
     }
@@ -121,13 +111,13 @@ class EditPostFragment : Fragment(), OnMapReadyCallback {
             }
             true
         }
-        binding.contentTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.contentTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangeContent(text.toString())
         }
         binding.addMediaButton.setOnClickListener {
             selectImageFromGalleryResult.launch("image/*")
         }
-        binding.coordsCheckbox.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.coordsCheckbox.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onSendCoordsChecked(isChecked)
         }
         binding.cancelMediaImageview.setOnClickListener {

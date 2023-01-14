@@ -21,6 +21,8 @@ class LoginViewModel @Inject constructor(
 
     val navigateToMainFragment = SingleLiveEvent<Unit>()
 
+    val authenticateError = SingleLiveEvent<String>()
+
     private val _loginError: MutableLiveData<Boolean> = MutableLiveData()
     val loginError: LiveData<Boolean>
         get() = _loginError
@@ -29,17 +31,17 @@ class LoginViewModel @Inject constructor(
     val passwordError: LiveData<Boolean>
         get() = _passwordError
 
-    fun onAunthentificateButtonClicked() {
+    fun onAuthenticateButtonClicked() {
         if (login.isBlank() || password.isBlank()) return
         viewModelScope.launch {
-            userRepository.authentificate(login, password)
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        navigateToMainFragment.postValue(Unit)
-                    } else {
-                        Log.e("onAunthentificateButtonClicked", result.error?.statusMessage.orEmpty())
-                    }
-                }
+            val result = userRepository.authenticate(login, password)
+            if (result.status == DataResult.Status.SUCCESS) {
+                navigateToMainFragment.postValue(Unit)
+            } else {
+                Log.e("onAuthenticateButtonClicked", result.error?.statusMessage.orEmpty())
+                authenticateError.postValue(result.error?.statusMessage.toString())
+            }
+
         }
     }
 

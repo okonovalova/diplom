@@ -4,15 +4,14 @@ import android.app.DatePickerDialog
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.diplom.R
 import com.example.diplom.databinding.FragmentEditJobBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,19 +22,10 @@ import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 
-class EditJobFragment() : Fragment() {
+class EditJobFragment : Fragment(R.layout.fragment_edit_job) {
     private val viewModel: EditJobViewModel by viewModels()
-    private lateinit var binding: FragmentEditJobBinding
-    val args: EditJobFragmentArgs by navArgs()
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentEditJobBinding.inflate(inflater)
-        return binding.root
-    }
+    private val binding by viewBinding(FragmentEditJobBinding::bind)
+    private val args: EditJobFragmentArgs by navArgs()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -68,13 +58,13 @@ class EditJobFragment() : Fragment() {
         viewModel.nameJobError.observe(viewLifecycleOwner) {
             with(binding.nameJobTextInput) {
                 isErrorEnabled = it
-                error = if (it) "Введите название организации" else null
+                error = if (it) context.getString(R.string.error_job_name) else null
             }
         }
         viewModel.positionError.observe(viewLifecycleOwner) {
             with(binding.positionTextInput) {
                 isErrorEnabled = it
-                error = if (it) "Введите должность" else null
+                error = if (it) context.getString(R.string.error_job_position) else null
             }
         }
         viewModel.navigateToMainFragment.observe(viewLifecycleOwner) {
@@ -101,14 +91,14 @@ class EditJobFragment() : Fragment() {
             }
             true
         }
-        binding.nameJobTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.nameJobTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangeNameJob(text.toString())
         }
-        binding.positionTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.positionTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangePosition(text.toString())
         }
 
-        binding.linkTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.linkTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangeLink(text.toString())
         }
 
@@ -145,7 +135,7 @@ class EditJobFragment() : Fragment() {
             }, year, month, day)
             datePickerDialog.show()
         }
-        binding.finishDateCheckbox.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.finishDateCheckbox.setOnCheckedChangeListener { _, isChecked ->
             viewModel.changeJobDateFinishCheckboxState(isChecked)
         }
     }

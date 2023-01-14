@@ -5,14 +5,11 @@ import android.net.Uri
 import com.example.diplom.data.api.MediaService
 import com.example.diplom.data.network.BaseRemoteRepository
 import com.example.diplom.data.network.DataResult
-import com.example.diplom.data.network.ResultError
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
 import javax.inject.Inject
@@ -21,27 +18,23 @@ import javax.inject.Inject
 class MediaRepository @Inject constructor(
     private val mediaService: MediaService,
     private val context: Context
-) : BaseRemoteRepository() {
-    fun downloadImage(uri: Uri): Flow<DataResult<String>> {
-        return flow {
+) : BaseRemoteRepository {
+    suspend fun downloadImage(uri: Uri): DataResult<String> {
+        return withContext(Dispatchers.Default) {
             val inputStream = context.contentResolver.openInputStream(uri)
-            val tempFile = java.io.File(context.cacheDir, "fileName")
+            val tempFile = File(context.cacheDir, "fileName")
             val oStream = FileOutputStream(tempFile)
             copy(inputStream!!, oStream)
             val requestFile = tempFile
                 .asRequestBody("image/jpg".toMediaType())
 
-            val result = getResult(
+            getResult(
                 request = { mediaService.downloadFile(requestFile) },
                 mapTo = {
                     it?.url.orEmpty()
                 }
             )
-            emit(result)
-
         }
-            .flowOn(Dispatchers.IO)
-            .catch { emit(DataResult.error(ResultError(0, it.toString()))) }
     }
 
     private fun copy(inputStream: InputStream, outputStream: FileOutputStream) {

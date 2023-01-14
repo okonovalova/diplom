@@ -7,6 +7,7 @@ import android.widget.MediaController
 import android.widget.PopupMenu
 import android.widget.VideoView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -19,8 +20,6 @@ import com.example.diplom.databinding.ItemPostBinding
 import com.example.diplom.domain.entity.AttachmentType
 import com.example.diplom.domain.entity.Post
 import com.example.diplom.domain.entity.STATE
-import com.example.diplom.ui.utils.visible
-
 
 class PostAdapter(
     private val onEditPostListener: (Post) -> Unit,
@@ -60,9 +59,9 @@ class PostAdapter(
             binding.textviewContent.text = post.content
             binding.authorNameTextview.text = post.author
             binding.authotJobPositionTextview.text = post.authorJob
-            binding.mediaImageview.visible(post.attachment != null)
-            binding.menuImageview.visible(post.ownedByMe)
-            binding.mapImageview.visible(post.coords != null)
+            binding.mediaImageview.isVisible = post.attachment != null
+            binding.menuImageview.isVisible = post.ownedByMe
+            binding.mapImageview.isVisible = post.coords != null
 
             bindPostLike(post)
             Glide
@@ -112,39 +111,39 @@ class PostAdapter(
             }
             binding.playVideoImageview.setOnClickListener {
                 binding.mediaVideoview.start()
-                binding.playVideoImageview.visible(false)
+                binding.playVideoImageview.isVisible = false
             }
         }
 
         private fun bindLayoutWithoutMedia() {
             with(binding) {
-                mediaImageview.visible(false)
-                playImageview.visible(false)
-                mediaVideoview.visible(false)
-                playVideoImageview.visible(false)
+                mediaImageview.isVisible = false
+                playImageview.isVisible = false
+                mediaVideoview.isVisible = false
+                playVideoImageview.isVisible = false
 
             }
         }
 
         private fun bindMediaImageLayout(post: Post) {
-            binding.mediaImageview.visible(true)
+            binding.mediaImageview.isVisible = true
             Glide
                 .with(binding.root)
                 .load(post.attachment?.url)
                 .error(R.drawable.ic_error)
                 .into(binding.mediaImageview)
-            binding.mediaVideoview.visible(false)
-            binding.playImageview.visible(false)
-            binding.playVideoImageview.visible(false)
+            binding.mediaVideoview.isVisible = false
+            binding.playImageview.isVisible = false
+            binding.playVideoImageview.isVisible = false
 
 
         }
 
         private fun bindMediaVideoLayout(post: Post) {
-            binding.mediaImageview.visible(false)
-            binding.playImageview.visible(false)
-            binding.playVideoImageview.visible(true)
-            binding.mediaVideoview.visible(true)
+            binding.mediaImageview.isVisible = false
+            binding.playImageview.isVisible = false
+            binding.playVideoImageview.isVisible = true
+            binding.mediaVideoview.isVisible = true
             val videoView: VideoView = binding.mediaVideoview
             videoView.setVideoURI(Uri.parse(post.attachment?.url))
             val mediaController = MediaController(binding.root.context)
@@ -154,18 +153,18 @@ class PostAdapter(
 
             videoView.setOnCompletionListener {
                 videoView.stopPlayback()
-                binding.playVideoImageview.visible(true)
+                binding.playVideoImageview.isVisible = true
                 binding.playVideoImageview.setImageResource(R.drawable.ic_play)
             }
         }
 
         private fun bindMediaAudioLayout() {
             with(binding) {
-                mediaVideoview.visible(false)
-                playVideoImageview.visible(false)
-                mediaImageview.visible(true)
+                mediaVideoview.isVisible = false
+                playVideoImageview.isVisible = false
+                mediaImageview.isVisible = true
                 mediaImageview.setImageResource(R.drawable.background_audio)
-                playImageview.visible(true)
+                playImageview.isVisible = true
             }
         }
 

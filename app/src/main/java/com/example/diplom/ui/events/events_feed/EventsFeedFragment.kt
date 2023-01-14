@@ -3,14 +3,13 @@ package com.example.diplom.ui.events.events_feed
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.example.diplom.R
 import com.example.diplom.databinding.FragmentEventsFeedBinding
 import com.example.diplom.domain.entity.Event
@@ -20,9 +19,9 @@ import com.example.diplom.ui.media.MediaLifecycleObserver
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class EventsFeedFragment() : Fragment() {
+class EventsFeedFragment : Fragment(R.layout.fragment_events_feed) {
     private val viewModel: EventsFeedViewModel by viewModels()
-    private lateinit var binding: FragmentEventsFeedBinding
+    private val binding by viewBinding(FragmentEventsFeedBinding::bind)
     private val adapter by lazy {
         EventAdapter(
             onEditEventListener = {
@@ -38,15 +37,6 @@ class EventsFeedFragment() : Fragment() {
         )
     }
     private val observer: MediaLifecycleObserver by lazy { MediaLifecycleObserver(viewModel::onFinishMedia) }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentEventsFeedBinding.inflate(inflater)
-        return binding.root
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

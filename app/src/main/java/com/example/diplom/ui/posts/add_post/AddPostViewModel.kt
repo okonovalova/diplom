@@ -13,7 +13,6 @@ import com.example.diplom.domain.entity.Coords
 import com.example.diplom.ui.utils.BottomMenuListener
 import com.example.diplom.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -52,26 +51,20 @@ class AddPostViewModel @Inject constructor(
             val imageUri = downloadedImage.value
             val coords = coords.value
             if (imageUri != null) {
-                mediaRepository.downloadImage(imageUri)
-                    .flatMapConcat { url ->
-                        postRepository.createPost(content, link, url.data, coords)
-                    }
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val url = mediaRepository.downloadImage(imageUri)
+                val result = postRepository.createPost(content, link, url.data, coords)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             } else {
-                postRepository.createPost(content, link, null, coords)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            navigateToMainFragment.postValue(Unit)
-                        } else {
-                            Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = postRepository.createPost(content, link, null, coords)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    navigateToMainFragment.postValue(Unit)
+                } else {
+                    Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }

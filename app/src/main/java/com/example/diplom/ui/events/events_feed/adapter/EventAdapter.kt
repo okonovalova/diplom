@@ -9,6 +9,7 @@ import android.widget.PopupMenu
 import android.widget.VideoView
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -21,7 +22,6 @@ import com.example.diplom.databinding.ItemEventBinding
 import com.example.diplom.domain.entity.AttachmentType
 import com.example.diplom.domain.entity.Event
 import com.example.diplom.domain.entity.STATE
-import com.example.diplom.ui.utils.visible
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -85,13 +85,13 @@ class EventAdapter(
                 AttachmentType.AUDIO -> bindMediaAudioLayout()
                 else -> bindLayoutWithoutMedia()
             }
-            binding.eventCoordsTextview.visible(event.coords != null)
-            binding.mapImageview.visible(event.coords != null)
+            binding.eventCoordsTextview.isVisible = event.coords != null
+            binding.mapImageview.isVisible = event.coords != null
 
             bindEventLike(event)
             bindParticipateButton(event)
 
-            binding.menuImageview.visible(event.ownedByMe)
+            binding.menuImageview.isVisible = event.ownedByMe
 
             if (event.attachment?.state == STATE.PLAY) {
                 binding.playImageview.setImageResource(R.drawable.ic_stop)
@@ -129,16 +129,16 @@ class EventAdapter(
             }
             binding.playVideoImageview.setOnClickListener {
                 binding.mediaVideoview.start()
-                binding.playVideoImageview.visible(false)
+                binding.playVideoImageview.isVisible = false
             }
         }
 
         private fun bindLayoutWithoutMedia() {
             with(binding) {
-                mediaImageview.visible(false)
-                playImageview.visible(false)
-                mediaVideoview.visible(false)
-                playVideoImageview.visible(false)
+                mediaImageview.isVisible = false
+                playImageview.isVisible = false
+                mediaVideoview.isVisible = false
+                playVideoImageview.isVisible = false
             }
         }
 
@@ -148,16 +148,16 @@ class EventAdapter(
                 .load(event.attachment?.url)
                 .error(R.drawable.ic_error)
                 .into(binding.mediaImageview)
-            binding.mediaVideoview.visible(false)
-            binding.playImageview.visible(false)
-            binding.playVideoImageview.visible(false)
+            binding.mediaVideoview.isVisible = false
+            binding.playImageview.isVisible = false
+            binding.playVideoImageview.isVisible = false
         }
 
         private fun bindMediaVideoLayout(event: Event) {
-            binding.mediaImageview.visible(false)
-            binding.playImageview.visible(false)
-            binding.playVideoImageview.visible(true)
-            binding.mediaVideoview.visible(true)
+            binding.mediaImageview.isVisible = false
+            binding.playImageview.isVisible = false
+            binding.playVideoImageview.isVisible = true
+            binding.mediaVideoview.isVisible = true
             val videoView: VideoView = binding.mediaVideoview
             videoView.setVideoURI(Uri.parse(event.attachment?.url))
             val mediaController = MediaController(binding.root.context)
@@ -167,16 +167,16 @@ class EventAdapter(
 
             videoView.setOnCompletionListener {
                 videoView.stopPlayback()
-                binding.playVideoImageview.visible(true)
+                binding.playVideoImageview.isVisible = true
                 binding.playVideoImageview.setImageResource(R.drawable.ic_play)
             }
         }
 
         private fun bindMediaAudioLayout() {
-            binding.mediaVideoview.visible(false)
-            binding.playVideoImageview.visible(false)
-            binding.mediaImageview.visible(true)
-            binding.playImageview.visible(true)
+            binding.mediaVideoview.isVisible = false
+            binding.playVideoImageview.isVisible = false
+            binding.mediaImageview.isVisible = true
+            binding.playImageview.isVisible = true
         }
 
         private fun bindEventLike(event: Event) {
@@ -201,9 +201,9 @@ class EventAdapter(
 
         private fun bindParticipateButton(event: Event) {
             if (event.participatedByMe) {
-                binding.participateButton.text = "Не участвовать"
+                binding.participateButton.text = binding.root.context.getString(R.string.button_event_not_participate)
             } else {
-                binding.participateButton.text = "Участвовать"
+                binding.participateButton.text = binding.root.context.getString(R.string.button_event_participate)
             }
         }
 

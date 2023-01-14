@@ -31,4 +31,13 @@
     <string name="user_jobs">Карьера:</string>
     <string name="add_job">Добавить</string>
     <string name="user_posts">Мои посты:</string>
+    <string name="error_event_content">Введите текст события</string>
+    <string name="button_event_participate">Участвовать</string>
+    <string name="button_event_not_participate">Не участвовать</string>
+    <string name="error_job_position">Введите должность</string>
+    <string name="error_job_name">Введите название организации</string>
+    <string name="error_login">Введите логин</string>
+    <string name="error_password">Введите пароль</string>
+    <string name="error_name">Введите имя</string>
+    <string name="error_post_content">Введите текст поста</string>
 </resources>

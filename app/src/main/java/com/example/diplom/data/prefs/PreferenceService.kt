@@ -10,12 +10,7 @@ class PreferenceService @Inject constructor(
 ) {
 
     companion object {
-        private const val PREFERENCE_NAME_COMMON = "common_pref"
         private const val PREFERENCE_NAME_CRYPTO = "crypto_pref"
-    }
-
-    private val preference by lazy {
-        context.getSharedPreferences(PREFERENCE_NAME_COMMON, Context.MODE_PRIVATE)
     }
 
     private val masterKey by lazy {
@@ -43,9 +38,4 @@ class PreferenceService @Inject constructor(
         set(value) {
             crypto.edit().putInt(::userId.name, value).apply()
         }
-
-    fun clear() {
-        preference.edit().clear().apply()
-        crypto.edit().clear().apply()
-    }
 }

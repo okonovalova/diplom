@@ -9,22 +9,20 @@ import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Bundle
 import android.text.format.DateFormat
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.DatePicker
 import android.widget.TimePicker
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.example.diplom.R
 import com.example.diplom.databinding.FragmentAddEventBinding
-import com.example.diplom.ui.utils.visible
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -33,13 +31,11 @@ import com.google.android.gms.maps.model.MarkerOptions
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AddEventFragment() : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDateSetListener,
+class AddEventFragment : Fragment(R.layout.fragment_add_event), OnMapReadyCallback, DatePickerDialog.OnDateSetListener,
     TimePickerDialog.OnTimeSetListener {
     private val viewModel: AddEventViewModel by viewModels()
-    private lateinit var binding: FragmentAddEventBinding
+    private val binding by viewBinding(FragmentAddEventBinding::bind)
     private lateinit var mMap: GoogleMap
-
-
     private var dateTimeShow = ""
     private var dateTimeData = ""
 
@@ -65,15 +61,6 @@ class AddEventFragment() : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDa
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentAddEventBinding.inflate(inflater)
-        return binding.root
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.onInitView()
@@ -92,15 +79,15 @@ class AddEventFragment() : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDa
         viewModel.contentError.observe(viewLifecycleOwner) {
             with(binding.contentTextInput) {
                 isErrorEnabled = it
-                error = if (it) "Введите текст события" else null
+                error = if (it) context.getString(R.string.error_event_content) else null
             }
         }
         viewModel.navigateToMainFragment.observe(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
         viewModel.downloadedImage.observe(viewLifecycleOwner) {
-            binding.showMediaImageview.visible(it != null)
-            binding.addMediaButton.visible(it == null)
+            binding.showMediaImageview.isVisible = it != null
+            binding.addMediaButton.isVisible = it == null
             Glide
                 .with(binding.root)
                 .load(it)
@@ -108,7 +95,7 @@ class AddEventFragment() : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDa
         }
         viewModel.sendCoords.observe(viewLifecycleOwner) {
             binding.coordsCheckbox.isChecked = it
-            binding.mapview.visible(it)
+            binding.mapview.isVisible = it
         }
     }
 
@@ -119,28 +106,25 @@ class AddEventFragment() : Fragment(), OnMapReadyCallback, DatePickerDialog.OnDa
             }
             true
         }
-        binding.contentTextEdit.doOnTextChanged { text, start, before, count ->
+        binding.contentTextEdit.doOnTextChanged { text, _, _, _ ->
             viewModel.onChangeContent(text.toString())
         }
         binding.addMediaButton.setOnClickListener {
             selectImageFromGalleryResult.launch("image/*")
         }
-        binding.coordsCheckbox.setOnCheckedChangeListener { compoundButton, isChecked ->
+        binding.coordsCheckbox.setOnCheckedChangeListener { _, _ ->
             viewModel.onSendCoordsChecked()
         }
         binding.cancelMediaImageview.setOnClickListener {
             viewModel.onCancelMedia()
         }
 
-        binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
+        binding.radioGroup.setOnCheckedChangeListener { _, checkedId ->
             if (R.id.radio_online == checkedId) {
                 viewModel.setEventType("ONLINE")
             } else {
                 viewModel.setEventType("OFFLINE")
             }
-
-            val text = "You selected: " + if (R.id.radio_online == checkedId) "online" else "offline"
-            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
 
         binding.addDateTimeImageview.setOnClickListener {

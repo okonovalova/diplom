@@ -36,23 +36,19 @@ class EventsFeedViewModel @Inject constructor(
     fun onLikeListener(event: Event) {
         viewModelScope.launch {
             if (event.likedByMe) {
-                eventRepository.dislikeEvent(event.id)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updateEvent(it) }
-                        } else {
-                            Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = eventRepository.dislikeEvent(event.id)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updateEvent(it) }
+                } else {
+                    Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
+                }
             } else {
-                eventRepository.likeEvent(event.id)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updateEvent(it) }
-                        } else {
-                            Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = eventRepository.likeEvent(event.id)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updateEvent(it) }
+                } else {
+                    Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }
@@ -60,38 +56,31 @@ class EventsFeedViewModel @Inject constructor(
     fun onParticipateListener(event: Event) {
         viewModelScope.launch {
             if (event.participatedByMe) {
-                eventRepository.deleteParticipation(event.id)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updateEvent(it) }
-                        } else {
-                            Log.e("onParticipateListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = eventRepository.deleteParticipation(event.id)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updateEvent(it) }
+                } else {
+                    Log.e("onParticipateListener", result.error?.statusMessage.orEmpty())
+                }
             } else {
-                eventRepository.addParticipation(event.id)
-                    .collect { result ->
-                        if (result.status == DataResult.Status.SUCCESS) {
-                            result.data?.let { updateEvent(it) }
-                        } else {
-                            Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
-                        }
-                    }
+                val result = eventRepository.addParticipation(event.id)
+                if (result.status == DataResult.Status.SUCCESS) {
+                    result.data?.let { updateEvent(it) }
+                } else {
+                    Log.e("onLikeListener", result.error?.statusMessage.orEmpty())
+                }
             }
         }
     }
 
     fun getEvents() {
         viewModelScope.launch {
-            eventRepository.getEvents()
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        result.data?.let { _eventsData.postValue(it) }
-                    } else {
-                        Log.e("getEvents", result.error?.statusMessage.orEmpty())
-                    }
-                }
-
+            val result = eventRepository.getEvents()
+            if (result.status == DataResult.Status.SUCCESS) {
+                result.data?.let { _eventsData.postValue(it) }
+            } else {
+                Log.e("getEvents", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 
@@ -137,14 +126,12 @@ class EventsFeedViewModel @Inject constructor(
 
     fun onRemoveClicked(event: Event) {
         viewModelScope.launch {
-            eventRepository.removeEvent(event.id.toString())
-                .collect { result ->
-                    if (result.status == DataResult.Status.SUCCESS) {
-                        getEvents()
-                    } else {
-                        Log.e("onDeleteListener", result.error?.statusMessage.orEmpty())
-                    }
-                }
+            val result = eventRepository.removeEvent(event.id.toString())
+            if (result.status == DataResult.Status.SUCCESS) {
+                getEvents()
+            } else {
+                Log.e("onDeleteListener", result.error?.statusMessage.orEmpty())
+            }
         }
     }
 }

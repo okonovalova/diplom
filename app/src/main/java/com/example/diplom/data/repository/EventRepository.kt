@@ -6,26 +6,24 @@ import com.example.diplom.data.model.AttachmentData
 import com.example.diplom.data.model.CoordsData
 import com.example.diplom.data.network.BaseRemoteRepository
 import com.example.diplom.data.network.DataResult
-import com.example.diplom.data.network.ResultError
 import com.example.diplom.data.request.EventCreateRequest
 import com.example.diplom.domain.entity.Coords
 import com.example.diplom.domain.entity.Event
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class EventRepository @Inject constructor(
     private val eventService: EventService
-) : BaseRemoteRepository() {
+) : BaseRemoteRepository {
 
-    suspend fun getEvents(): Flow<DataResult<List<Event>>> {
-        return flow {
-            val result = getResult(
+    suspend fun getEvents(): DataResult<List<Event>> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.getEvents() },
                 mapTo = EventMapper::mapListDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
     suspend fun createEvent(
@@ -35,7 +33,7 @@ class EventRepository @Inject constructor(
         coords: Coords?,
         type: String,
         eventDateTime: String
-    ): Flow<DataResult<Event>> {
+    ): DataResult<Event> {
         val attachment = if (imageUrl == null) null else AttachmentData("IMAGE", imageUrl)
         val coordsData = if (coords == null) null else CoordsData(coords.lat, coords.long)
         val eventType = type
@@ -48,14 +46,13 @@ class EventRepository @Inject constructor(
             type = eventType,
             datetime = eventDateTime,
 
-        )
-        return flow {
-            val result = getResult(
+            )
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.createEvent(body) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
     suspend fun editEvent(
@@ -66,7 +63,7 @@ class EventRepository @Inject constructor(
         coords: Coords?,
         type: String,
         eventDateTime: String
-    ): Flow<DataResult<Event>> {
+    ): DataResult<Event> {
         val attachment = if (imageUrl == null) null else AttachmentData("IMAGE", imageUrl)
         val coordsData = if (coords == null) null else CoordsData(coords.lat, coords.long)
         val eventType = type
@@ -80,67 +77,56 @@ class EventRepository @Inject constructor(
             datetime = eventDateTime,
 
             )
-        return flow {
-            val result = getResult(
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.createEvent(body) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun likeEvent(id: Int): Flow<DataResult<Event>> {
-        return flow {
-            val result = getResult(
+    suspend fun likeEvent(id: Int): DataResult<Event> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.likeEvent(id.toString()) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
         }
-            .flowOn(Dispatchers.IO)
     }
 
-    suspend fun dislikeEvent(id: Int): Flow<DataResult<Event>> {
-        return flow {
-            val result = getResult(
+    suspend fun dislikeEvent(id: Int): DataResult<Event> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.dislikeEvent(id.toString()) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
         }
-            .flowOn(Dispatchers.IO)
-            .catch {
-                emit(DataResult.error(ResultError(0, it.toString())))
-            }
     }
 
-    suspend fun addParticipation(id: Int): Flow<DataResult<Event>> {
-        return flow {
-            val result = getResult(
+    suspend fun addParticipation(id: Int): DataResult<Event> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.addParticipation(id.toString()) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun deleteParticipation(id: Int): Flow<DataResult<Event>> {
-        return flow {
-            val result = getResult(
+    suspend fun deleteParticipation(id: Int): DataResult<Event> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.deleteParticipation(id.toString()) },
                 mapTo = EventMapper::mapDataToDomain
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    suspend fun removeEvent(id: String): Flow<DataResult<Unit>> {
-        return flow {
-            val result = getResult(
+    suspend fun removeEvent(id: String): DataResult<Unit> {
+        return withContext(Dispatchers.Default) {
+            getResult(
                 request = { eventService.removeEvent(id) },
                 mapTo = {}
             )
-            emit(result)
-        }.flowOn(Dispatchers.IO)
+        }
     }
 }
