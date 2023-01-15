@@ -37,6 +37,9 @@ class EditPostViewModel @Inject constructor(
     val coords: LiveData<Coords?>
         get() = _coords
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
 
     private var id: String = ""
     private var content: String = ""
@@ -56,7 +59,9 @@ class EditPostViewModel @Inject constructor(
     }
 
     fun onDoneButtonClicked(post: Post) {
+        _isLoading.postValue(true)
         viewModelScope.launch {
+            _isLoading.postValue(false)
             id = post.id.toString()
             val imageUri = downloadedImage.value?.uri
             val coords = coords.value

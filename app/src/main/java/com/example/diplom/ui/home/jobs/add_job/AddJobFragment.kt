@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -57,6 +58,9 @@ class AddJobFragment : Fragment(R.layout.fragment_add_job) {
                 binding.addDateFinishImageview.visibility = View.VISIBLE
                 binding.dateFinishValueTextview.visibility = View.VISIBLE
             }
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
         }
     }
 

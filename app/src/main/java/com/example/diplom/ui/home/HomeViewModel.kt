@@ -42,29 +42,53 @@ class HomeViewModel @Inject constructor(
     val playingMediaPost: LiveData<Post?>
         get() = _playingMediaPost
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
+    val errorMessage = SingleLiveEvent<String>()
+
     fun onInitView() {
         bottomMenuListener.showBottomMenu.postValue(true)
     }
 
-    fun getUserInfo() {
+    fun getInfo() {
+        _isLoading.postValue(true)
         viewModelScope.launch {
-            val result = userRepository.getUserInfo()
-            if (result.status == DataResult.Status.SUCCESS) {
-                result.data?.let { _userData.postValue(it) }
-            } else {
-                Log.e("getUserInfo", result.error?.statusMessage.orEmpty())
-            }
+            getUserInfo()
+            getJobs()
+            getPosts()
+            _isLoading.postValue(false)
         }
     }
 
-    fun getJobs() {
-        viewModelScope.launch {
-            val result = jobRepository.getJobs()
-            if (result.status == DataResult.Status.SUCCESS) {
-                result.data?.let { _jobsData.postValue(it) }
-            } else {
-                Log.e("getJobs", result.error?.statusMessage.orEmpty())
-            }
+    private suspend fun getUserInfo() {
+        val result = userRepository.getUserInfo()
+        if (result.status == DataResult.Status.SUCCESS) {
+            result.data?.let { _userData.postValue(it) }
+        } else {
+            errorMessage.postValue(result.error?.statusMessage.toString())
+            Log.e("getUserInfo", result.error?.statusMessage.orEmpty())
+        }
+    }
+
+    private suspend fun getJobs() {
+        val result = jobRepository.getJobs()
+        if (result.status == DataResult.Status.SUCCESS) {
+            result.data?.let { _jobsData.postValue(it) }
+        } else {
+            errorMessage.postValue(result.error?.statusMessage.toString())
+            Log.e("getJobs", result.error?.statusMessage.orEmpty())
+        }
+    }
+
+    private suspend fun getPosts() {
+        val result = postRepository.getMyPosts()
+        if (result.status == DataResult.Status.SUCCESS) {
+            result.data?.let { _postsData.postValue(it) }
+        } else {
+            errorMessage.postValue(result.error?.statusMessage.toString())
+            Log.e("getMyPosts", result.error?.statusMessage.orEmpty())
         }
     }
 
@@ -75,17 +99,6 @@ class HomeViewModel @Inject constructor(
                 getJobs()
             } else {
                 Log.e("onRemoveJobListener", result.error?.statusMessage.orEmpty())
-            }
-        }
-    }
-
-    fun getPosts() {
-        viewModelScope.launch {
-            val result = postRepository.getMyPosts()
-            if (result.status == DataResult.Status.SUCCESS) {
-                result.data?.let { _postsData.postValue(it) }
-            } else {
-                Log.e("getMyPosts", result.error?.statusMessage.orEmpty())
             }
         }
     }

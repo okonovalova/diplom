@@ -49,6 +49,10 @@ class EditEventViewModel @Inject constructor(
     val contentError: LiveData<Boolean>
         get() = _contentError
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private var content: String = ""
     private var link: String? = null
     val navigateToMainFragment = SingleLiveEvent<Unit>()
@@ -59,6 +63,7 @@ class EditEventViewModel @Inject constructor(
 
     fun onDoneButtonClicked(event: Event) {
         if (content.isBlank()) return
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val id = event.id.toString()
             val imageUri = downloadedImage.value?.uri
@@ -81,6 +86,8 @@ class EditEventViewModel @Inject constructor(
                     Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
                 }
             }
+            _isLoading.postValue(false)
+
         }
     }
 

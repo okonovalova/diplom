@@ -51,12 +51,18 @@ class AddEventViewModel @Inject constructor(
     private var link: String? = null
     val navigateToMainFragment = SingleLiveEvent<Unit>()
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
+
     fun onInitView() {
         bottomMenuListener.showBottomMenu.postValue(false)
     }
 
     fun onDoneButtonClicked() {
         if (content.isBlank()) return
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val imageUri = downloadedImage.value
             val coords = coords.value
@@ -78,6 +84,7 @@ class AddEventViewModel @Inject constructor(
                     Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
                 }
             }
+            _isLoading.postValue(false)
         }
     }
 

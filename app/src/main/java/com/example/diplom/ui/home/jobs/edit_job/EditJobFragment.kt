@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -81,6 +82,9 @@ class EditJobFragment : Fragment(R.layout.fragment_edit_job) {
                 binding.addDateFinishImageview.visibility = View.VISIBLE
                 binding.dateFinishValueTextview.visibility = View.VISIBLE
             }
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
         }
     }
 

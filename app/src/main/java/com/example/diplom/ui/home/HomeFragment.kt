@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,7 @@ import com.example.diplom.domain.entity.STATE
 import com.example.diplom.ui.adapter.PostAdapter
 import com.example.diplom.ui.home.adapter.JobAdapter
 import com.example.diplom.ui.media.MediaLifecycleObserver
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -64,6 +66,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )
         binding.recyclerJobs.addItemDecoration(dividerItemDecoration)
 
+        viewModel.getInfo()
+
         binding.recyclerPosts.adapter = postsAdapter
         val dividerItemDecoration1 = DividerItemDecoration(
             binding.recyclerPosts.context,
@@ -71,10 +75,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )
         binding.recyclerPosts.addItemDecoration(dividerItemDecoration1)
 
-        viewModel.getUserInfo()
         observeViewModel()
-        viewModel.getJobs()
-        viewModel.getPosts()
 
         binding.addJobTextview.setOnClickListener {
             navigateToAddJob()
@@ -126,6 +127,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         viewModel.navigateToAddPost.observe(viewLifecycleOwner) {
             navigateToAddPost()
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorText ->
+            Snackbar.make(binding.root, errorText, Snackbar.LENGTH_SHORT).show()
         }
     }
 

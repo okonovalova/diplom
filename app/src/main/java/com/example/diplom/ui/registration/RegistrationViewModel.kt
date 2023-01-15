@@ -6,8 +6,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.diplom.R
 import com.example.diplom.data.network.DataResult
 import com.example.diplom.data.repository.UserRepository
+import com.example.diplom.ui.utils.ResourceManager
 import com.example.diplom.ui.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -16,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val resourceManager: ResourceManager,
 ) : ViewModel() {
 
     private var login: String = ""
@@ -40,14 +43,19 @@ class RegistrationViewModel @Inject constructor(
     val downloadedImage: LiveData<Uri?>
         get() = _downloadedImage
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     fun onRegistrateButtonClicked() {
         if (login.isBlank() || password.isBlank() || name.isBlank()) {
-            registrationError.postValue("Заполните все поля")
+            registrationError.postValue(resourceManager.getString(R.string.error_empty_fields))
             return
         }
-
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val result = userRepository.registrate(login, password, name, downloadedImage.value)
+            _isLoading.postValue(false)
             if (result.status == DataResult.Status.SUCCESS) {
                 navigateToMainFragment.postValue(Unit)
             } else {

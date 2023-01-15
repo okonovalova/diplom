@@ -119,6 +119,10 @@ class EditEventFragment : Fragment(R.layout.fragment_edit_event), OnMapReadyCall
             binding.coordsCheckbox.isChecked = it
             binding.mapview.isVisible = it
         }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
     }
 
     private fun initListeners() {

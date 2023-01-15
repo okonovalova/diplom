@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -33,7 +33,7 @@
                 android:textSize="26sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <FrameLayout
                 android:id="@+id/login_layout_text"
@@ -66,7 +66,7 @@
                         android:imeOptions="actionNext"
                         android:textColor="@color/black"
                         android:textCursorDrawable="@drawable/cursor"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -103,7 +103,7 @@
                         android:imeOptions="actionNext"
                         android:textColor="@color/black"
                         android:textCursorDrawable="@drawable/cursor"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"/>
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -122,7 +122,7 @@
                 android:text="@string/login_button"
                 android:textColor="@color/white"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/password_layout_text" />
+                app:layout_constraintTop_toBottomOf="@+id/password_layout_text"/>
 
             <TextView
                 android:id="@+id/registration_link_textview"
@@ -137,10 +137,16 @@
 
                 app:layout_constraintEnd_toEndOf="@id/confirm_button"
                 app:layout_constraintStart_toStartOf="@id/confirm_button"
-                app:layout_constraintTop_toBottomOf="@id/confirm_button" />
+                app:layout_constraintTop_toBottomOf="@id/confirm_button"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <include
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/progress_layout"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

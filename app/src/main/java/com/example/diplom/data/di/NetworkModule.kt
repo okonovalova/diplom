@@ -83,63 +83,15 @@ object NetworkModule {
         .client(client)
         .build()
 
-
-    @Provides
-    @Singleton
-    fun provideHostnameVerifier(): HostnameVerifier {
-        return HostnameVerifier { hostname, session ->
-            HttpsURLConnection.getDefaultHostnameVerifier().run {
-                verify(hostname, session)
-            }
-        }
-    }
-
-    @Provides
-    @Singleton
-    fun provideX509TrustManager(): X509TrustManager {
-        return object : X509TrustManager {
-            override fun checkClientTrusted(
-                chain: Array<java.security.cert.X509Certificate>,
-                authType: String
-            ) {}
-
-            override fun checkServerTrusted(
-                chain: Array<java.security.cert.X509Certificate>,
-                authType: String
-            ) {}
-
-            override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
-                return arrayOf()
-            }
-        }
-    }
-
-    @Provides
-    @Singleton
-    fun provideSSLSocketFactory(trustManager: X509TrustManager): SSLSocketFactory {
-        return SSLContext.getInstance("TLS").apply {
-            init(
-                null,
-                arrayOf<TrustManager>(trustManager),
-                java.security.SecureRandom()
-            )
-        }.socketFactory
-    }
-
     @Provides
     @Singleton
     fun provideOkHttpClient(
         headerInterceptor: Interceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor,
-        hostnameVerifier: HostnameVerifier,
-        sslSocketFactory: SSLSocketFactory,
-        unsafeX509TrustManager: X509TrustManager
     ): OkHttpClient {
         return OkHttpClient().newBuilder()
             .addInterceptor(headerInterceptor)
             .addInterceptor(httpLoggingInterceptor)
-            .sslSocketFactory(sslSocketFactory, unsafeX509TrustManager)
-            .hostnameVerifier(hostnameVerifier)
             .build()
     }
 }

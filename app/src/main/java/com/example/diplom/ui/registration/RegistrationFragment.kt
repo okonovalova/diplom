@@ -89,6 +89,9 @@ class RegistrationFragment : Fragment(R.layout.fragment_registration) {
                 .into(binding.showMediaImageview)
         }
 
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
     }
 
     private fun navigateToMainFragment() {

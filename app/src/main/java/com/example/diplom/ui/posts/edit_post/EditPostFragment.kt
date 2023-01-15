@@ -102,6 +102,9 @@ class EditPostFragment : Fragment(R.layout.fragment_edit_post), OnMapReadyCallba
             binding.mapview.isVisible = it
         }
 
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
     }
 
     private fun initListeners() {

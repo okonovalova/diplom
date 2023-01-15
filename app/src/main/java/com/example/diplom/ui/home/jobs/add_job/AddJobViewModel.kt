@@ -38,6 +38,10 @@ class AddJobViewModel @Inject constructor(
     val jobDateFinishCheckbox: LiveData<Boolean>
         get() = _jobDateFinishCheckbox
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     private var nameJob: String = ""
     private var position: String = ""
     private var link: String? = null
@@ -50,6 +54,7 @@ class AddJobViewModel @Inject constructor(
 
     fun onDoneButtonClicked() {
         if (nameJob.isBlank()) return
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val dateStartTime = jobDateStartTime.value
             val dateFinishTime = jobDateFinishTime.value
@@ -59,6 +64,7 @@ class AddJobViewModel @Inject constructor(
             } else {
                 Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
             }
+            _isLoading.postValue(false)
         }
     }
 

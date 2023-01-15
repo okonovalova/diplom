@@ -40,4 +40,5 @@
     <string name="error_password">Введите пароль</string>
     <string name="error_name">Введите имя</string>
     <string name="error_post_content">Введите текст поста</string>
+    <string name="error_empty_fields">Заполните все поля</string>
 </resources>

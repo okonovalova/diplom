@@ -13,6 +13,7 @@
     <color name="colorGrayBlack">#22324E</color>
     <color name="colorAccentBackground">#5F4AEC</color>
     <color name="colorDimming">#cc000000</color>
+    <color name="colorLoaderBackground">#66000000</color>
 
     <color name="colorTextTitle">@color/midnight_express</color>
     <color name="colorTextSubtitle">#333333</color>

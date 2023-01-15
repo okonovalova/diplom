@@ -2,6 +2,7 @@ package com.example.diplom.ui.login
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -63,6 +64,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             Snackbar.make(binding.root, errorText, Snackbar.LENGTH_SHORT).show()
         }
 
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
     }
 
     private fun navigateToMainFragment() {

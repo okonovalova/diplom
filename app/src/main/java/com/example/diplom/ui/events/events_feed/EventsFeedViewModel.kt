@@ -29,6 +29,10 @@ class EventsFeedViewModel @Inject constructor(
     val playingMediaEvent: LiveData<Event?>
         get() = _playingMediaEvent
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     fun onInitView() {
         bottomMenuListener.showBottomMenu.postValue(true)
     }
@@ -74,6 +78,7 @@ class EventsFeedViewModel @Inject constructor(
     }
 
     fun getEvents() {
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val result = eventRepository.getEvents()
             if (result.status == DataResult.Status.SUCCESS) {
@@ -81,6 +86,7 @@ class EventsFeedViewModel @Inject constructor(
             } else {
                 Log.e("getEvents", result.error?.statusMessage.orEmpty())
             }
+            _isLoading.postValue(false)
         }
     }
 

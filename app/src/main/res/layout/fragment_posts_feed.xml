@@ -28,4 +28,9 @@
         app:tint ="@color/white"
         />
 
+    <include
+        android:id="@+id/progress_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        layout="@layout/progress_layout"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

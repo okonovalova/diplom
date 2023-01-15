@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -51,9 +52,9 @@ class EventsFeedFragment : Fragment(R.layout.fragment_events_feed) {
         binding.fabAddEvent.setOnClickListener {
             navigateToAddEvent()
         }
+        viewModel.getEvents()
         observeViewModel()
         initListeners()
-        viewModel.getEvents()
     }
 
     private fun observeViewModel() {
@@ -77,6 +78,9 @@ class EventsFeedFragment : Fragment(R.layout.fragment_events_feed) {
                     }.play()
                 }
             }
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
         }
     }
 

@@ -96,6 +96,9 @@ class AddPostFragment : Fragment(R.layout.fragment_add_post), OnMapReadyCallback
             binding.coordsCheckbox.isChecked = it
             binding.mapview.isVisible = it
         }
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressLayout.root.isVisible = isLoading
+        }
     }
 
     private fun initListeners() {

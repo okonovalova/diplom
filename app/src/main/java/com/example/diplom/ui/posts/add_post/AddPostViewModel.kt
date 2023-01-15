@@ -33,6 +33,10 @@ class AddPostViewModel @Inject constructor(
     val coords: LiveData<Coords?>
         get() = _coords
 
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
+
     fun onInitView() {
         bottomMenuListener.showBottomMenu.postValue(false)
     }
@@ -47,6 +51,7 @@ class AddPostViewModel @Inject constructor(
 
     fun onDoneButtonClicked() {
         if (content.isBlank()) return
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val imageUri = downloadedImage.value
             val coords = coords.value
@@ -66,6 +71,7 @@ class AddPostViewModel @Inject constructor(
                     Log.e("onDoneButtonClicked", result.error?.statusMessage.orEmpty())
                 }
             }
+            _isLoading.postValue(false)
         }
     }
 

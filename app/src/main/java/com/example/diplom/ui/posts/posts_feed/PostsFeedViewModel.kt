@@ -31,12 +31,16 @@ class PostsFeedViewModel @Inject constructor(
         get() = _playingMediaPost
 
     val navigateToAddPost = SingleLiveEvent<Unit>()
+    private val _isLoading: MutableLiveData<Boolean> = MutableLiveData(false)
+    val isLoading: LiveData<Boolean>
+        get() = _isLoading
 
     fun onInitView() {
         bottomMenuListener.showBottomMenu.postValue(true)
     }
 
     fun getPosts() {
+        _isLoading.postValue(true)
         viewModelScope.launch {
             val result = postRepository.getPosts()
             if (result.status == DataResult.Status.SUCCESS) {
@@ -44,6 +48,7 @@ class PostsFeedViewModel @Inject constructor(
             } else {
                 Log.e("getPosts", result.error?.statusMessage.orEmpty())
             }
+            _isLoading.postValue(false)
         }
 
     }
